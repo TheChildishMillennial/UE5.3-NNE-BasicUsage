@@ -494,62 +494,12 @@ void ANeuralNetwork::RunAsyncInference(bool InBSuccess, bool OutBSuccess, TArray
 }
 
 
-// Callback function for when model data is loaded asynchronously.
-void ANeuralNetwork::OnModelDataLoaded()
+void ANeuralNetwork::BeginPlay()
 {
-    if (LazyLoadedModelData.IsValid())
-    {
-        // Log the name of the loaded model
-        UE_LOG(LogTemp, Display, TEXT("LazyLoadedModelData loaded %s"), *LazyLoadedModelData.Get()->GetName());
-
-        // Create NNE Runtime
-        TWeakInterfacePtr<INNERuntimeCPU> Runtime = UE::NNE::GetRuntime<INNERuntimeCPU>(FString("NNERuntimeORTCpu"));
-        if (Runtime.IsValid())
-        {
-            // Initialize ModelHelper and create the model instance
-            m_ModelHelper = MakeShared<FModelHelper>();
-            Model = Runtime->CreateModel(LazyLoadedModelData.Get());
-
-            if (Model.IsValid())
-            {
-                m_mutex.Lock();
-
-                m_ModelHelper->ModelInstance = Model->CreateModelInstance();
-
-                m_mutex.Unlock();
-
-                if (m_ModelHelper->ModelInstance.IsValid())
-                {
-                    m_mutex.Lock();
-
-                    m_ModelHelper->bIsRunning = false;
-
-                    m_mutex.Unlock();
-
-                    IsModelRunning = false;
-
-                    // Log the success message
-                    UE_LOG(LogTemp, Display, TEXT("Model successfully created"));
-                }
-                else
-                {
-                    UE_LOG(LogTemp, Display, TEXT("Failed to create Model Instance"));
-                }
-            }
-            else
-            {
-                UE_LOG(LogTemp, Display, TEXT("Failed to create Model"));
-            }
-        }
-        else
-        {
-            UE_LOG(LogTemp, Display, TEXT("Failed to create Runtime"));
-        }
-    }
-    else
-    {
-        UE_LOG(LogTemp, Display, TEXT("LazyLoadedModelData is not valid"));
-    }
+    Super::BeginPlay();
 }
 
-
+void ANeuralNetwork::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+}
